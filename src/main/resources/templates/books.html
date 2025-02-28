@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <h1>Available Books</h1>
+    <div th:each="book : ${books}">
+        <h3 th:text="${book.title}"></h3>
+        <p>Author: <span th:text="${book.author}"></span></p>
+        <p>Price: $<span th:text="${book.price}"></span></p>
+        <form th:action="@{/cart/add/{bookId}(bookId=${book.id})}" method="post">
+            <button type="submit">Add to Cart</button>
+        </form>
+    </div>
+</body>
+</html>

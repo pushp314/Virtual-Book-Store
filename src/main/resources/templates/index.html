@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Bookstore</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Virtual Bookstore</h1>
+        <nav>
+            <a th:href="@{/books}">Browse Books</a>
+            <a th:href="@{/cart}">View Cart</a>
+            <a th:href="@{/orders}">Orders</a>
+            <a th:href="@{/reviews}">Reviews</a>
+        </nav>
+    </header>
+    <main>
+        <p>Explore and purchase books just like in a real bookstore!</p>
+    </main>
+</body>
+</html>

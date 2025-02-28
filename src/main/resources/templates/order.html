@@ -1,0 +1,29 @@
+<!-- orders.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+    <link rel="stylesheet" href="/static/css/styles.css"> <!-- Link to CSS file -->
+</head>
+<body>
+    <h1>My Orders</h1>
+    <table border="1">
+        <tr>
+            <th>Order ID</th>
+            <th>User ID</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Created At</th>
+        </tr>
+        <tr th:each="order : ${orders}">
+            <td th:text="${order.id}"></td>
+            <td th:text="${order.user.id}"></td>
+            <td th:text="${order.totalPrice}"></td>
+            <td th:text="${order.status}"></td>
+            <td th:text="${order.createdAt}"></td>
+        </tr>
+    </table>
+</body>
+</html>

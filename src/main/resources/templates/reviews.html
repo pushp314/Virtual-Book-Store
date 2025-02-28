@@ -1,0 +1,29 @@
+<!-- reviews.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Reviews</title>
+    <link rel="stylesheet" href="/static/css/styles.css"> <!-- Link to CSS file -->
+</head>
+<body>
+    <h1>Book Reviews</h1>
+    <table border="1">
+        <tr>
+            <th>Review ID</th>
+            <th>User ID</th>
+            <th>Book ID</th>
+            <th>Rating</th>
+            <th>Review</th>
+        </tr>
+        <tr th:each="review : ${reviews}">
+            <td th:text="${review.id}"></td>
+            <td th:text="${review.user.id}"></td>
+            <td th:text="${review.book.id}"></td>
+            <td th:text="${review.rating}"></td>
+            <td th:text="${review.reviewText}"></td>
+        </tr>
+    </table>
+</body>
+</html>

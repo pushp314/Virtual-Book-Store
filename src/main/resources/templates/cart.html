@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <h1>Your Cart</h1>
+    <div th:each="item : ${cartItems}">
+        <h3 th:text="${item.book.title}"></h3>
+        <p>Quantity: <span th:text="${item.quantity}"></span></p>
+    </div>
+    <form th:action="@{/orders/create/1}" method="post">
+        <button type="submit">Proceed to Checkout</button>
+    </form>
+</body>
+</html>
