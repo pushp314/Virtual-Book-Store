@@ -2,14 +2,13 @@ package com.virtualbookstore.controller;
 
 import com.virtualbookstore.model.Review;
 import com.virtualbookstore.service.ReviewService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
-@RequestMapping("/reviews")
+@RestController
+@RequestMapping("/api/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
 
@@ -17,36 +16,38 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
+    // Get all reviews
     @GetMapping
-    public String getAllReviews(Model model) {
+    public ResponseEntity<List<Review>> getAllReviews() {
         List<Review> reviews = reviewService.getAllReviews();
-        model.addAttribute("reviews", reviews);
-        return "reviews"; // Thymeleaf template name
+        return ResponseEntity.ok(reviews);
     }
 
+    // Get reviews by book ID
     @GetMapping("/book/{bookId}")
-    public String getReviewsByBook(@PathVariable Long bookId, Model model) {
+    public ResponseEntity<List<Review>> getReviewsByBook(@PathVariable Long bookId) {
         List<Review> reviews = reviewService.getReviewsByBook(bookId);
-        model.addAttribute("reviews", reviews);
-        return "reviews"; // Thymeleaf template name
+        return ResponseEntity.ok(reviews);
     }
 
+    // Get reviews by user ID
     @GetMapping("/user/{userId}")
-    public String getReviewsByUser(@PathVariable Long userId, Model model) {
+    public ResponseEntity<List<Review>> getReviewsByUser(@PathVariable Long userId) {
         List<Review> reviews = reviewService.getReviewsByUser(userId);
-        model.addAttribute("reviews", reviews);
-        return "reviews"; // Thymeleaf template name
+        return ResponseEntity.ok(reviews);
     }
 
+    // Add a review
     @PostMapping("/add")
-    public String addReview(@ModelAttribute Review review) {
-        reviewService.addReview(review.getUser(), review.getBook(), review.getRating(), review.getReviewText());
-        return "redirect:/reviews"; // Redirect back to the reviews page after adding
+    public ResponseEntity<Review> addReview(@RequestBody Review review) {
+        Review newReview = reviewService.addReview(review.getUser(), review.getBook(), review.getRating(), review.getReviewText());
+        return ResponseEntity.ok(newReview);
     }
 
-    @GetMapping("/delete/{reviewId}")
-    public String deleteReview(@PathVariable Long reviewId) {
+    // Delete a review
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<String> deleteReview(@PathVariable Long reviewId) {
         reviewService.deleteReview(reviewId);
-        return "redirect:/reviews"; // Redirect back to the reviews page after deletion
+        return ResponseEntity.ok("Review deleted successfully!");
     }
 }

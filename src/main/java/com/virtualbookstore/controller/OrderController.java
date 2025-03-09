@@ -2,49 +2,69 @@ package com.virtualbookstore.controller;
 
 import com.virtualbookstore.model.Order;
 import com.virtualbookstore.model.User;
+import com.virtualbookstore.repository.UserRepository;
 import com.virtualbookstore.service.OrderService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
-@Controller
-@RequestMapping("/orders")
+@RestController
+@RequestMapping("/api/orders")
 public class OrderController {
     private final OrderService orderService;
+    private final UserRepository userRepository;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, UserRepository userRepository) {
         this.orderService = orderService;
+        this.userRepository = userRepository;
     }
 
+    // Get all orders
     @GetMapping
-    public String getUserOrders(Model model) {
+    public ResponseEntity<List<Order>> getAllOrders() {
         List<Order> orders = orderService.getAllOrders();
-        model.addAttribute("orders", orders);
-        return "orders"; // Thymeleaf template name
+        return ResponseEntity.ok(orders);
     }
 
-    @GetMapping("/details/{orderId}")
-    public String getOrderDetails(@PathVariable Long orderId, Model model) {
-        Optional<Order> order = orderService.getOrderById(orderId);
-        order.ifPresent(o -> model.addAttribute("order", o));
-        return "order-details"; // Create a separate page for order details if needed
+    // Get order details by ID
+    @GetMapping("/{orderId}")
+    public ResponseEntity<Order> getOrderDetails(@PathVariable Long orderId) {
+        return orderService.getOrderById(orderId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
+    // Create an order
+    // The frontend sends only the totalPrice in the JSON body.
+    // The authenticated user is derived from the Principal.
     @PostMapping("/create")
-    public String createOrder(@ModelAttribute Order order) {
-        User user = order.getUser();
-        BigDecimal totalPrice = order.getTotalPrice();
-        orderService.createOrder(user, totalPrice);
-        return "redirect:/orders"; // Redirect back to the orders page
+    public ResponseEntity<Order> createOrder(Principal principal, @RequestBody Map<String, Object> request) {
+        try {
+            String email = principal.getName();
+            System.out.println("Creating order for user: " + email);
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+            // Ensure the request contains "totalPrice"
+            if (!request.containsKey("totalPrice")) {
+                throw new RuntimeException("Missing 'totalPrice' in request body");
+            }
+            BigDecimal totalPrice = new BigDecimal(request.get("totalPrice").toString());
+            Order createdOrder = orderService.createOrder(user, totalPrice);
+            return ResponseEntity.ok(createdOrder);
+        } catch(Exception e) {
+            e.printStackTrace(); // Print the full stack trace for debugging
+            return ResponseEntity.status(500).body(null);
+        }
     }
 
-    @GetMapping("/delete/{orderId}")
-    public String deleteOrder(@PathVariable Long orderId) {
+    // Delete an order
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId) {
         orderService.deleteOrder(orderId);
-        return "redirect:/orders"; // Redirect back to the orders page after deletion
+        return ResponseEntity.ok("Order deleted successfully!");
     }
 }

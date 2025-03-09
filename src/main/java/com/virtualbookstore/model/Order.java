@@ -21,6 +21,15 @@ public class Order {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    // Constructors
+    public Order() {}
+
+    public Order(User user, BigDecimal totalPrice) {
+        this.user = user;
+        this.totalPrice = totalPrice;
+        this.status = "PENDING";
+    }
+
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -35,5 +44,4 @@ public class Order {
     public void setStatus(String status) { this.status = status; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

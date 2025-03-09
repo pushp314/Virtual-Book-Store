@@ -25,12 +25,12 @@ public class OrderService {
         return orderRepository.findById(orderId);
     }
 
-    // ✅ Fix: Add this method to match the controller call
+    // Create an order for the given user with the specified total price.
     public Order createOrder(User user, BigDecimal totalPrice) {
         Order order = new Order();
         order.setUser(user);
         order.setTotalPrice(totalPrice);
-        order.setStatus("Pending"); // Default status for new orders
+        order.setStatus("PENDING"); // Standard status for new orders
         return orderRepository.save(order);
     }
 

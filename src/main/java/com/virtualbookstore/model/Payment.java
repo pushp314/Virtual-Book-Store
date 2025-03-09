@@ -17,6 +17,16 @@ public class Payment {
     private String transactionId;  // Mock transaction ID
     private String status;         // PENDING, COMPLETED, FAILED
 
+    public Payment() {}
+
+    public Payment(Order order, String paymentMethod, String transactionId, String status) {
+        this.order = order;
+        this.paymentMethod = paymentMethod;
+        this.transactionId = transactionId;
+        this.status = status;
+    }
+
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "cart")
 public class Cart {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,5 +22,5 @@ public class Cart {
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
-    private int quantity;
+    private int quantity; // Ensure this field is present
 }

@@ -3,12 +3,10 @@ package com.virtualbookstore.controller;
 import com.virtualbookstore.model.Book;
 import com.virtualbookstore.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/books")
@@ -19,48 +17,46 @@ public class BookController {
 
     // Create or Update Book
     @PostMapping
-    public Book createBook(@RequestBody Book book) {
-        return bookService.saveBook(book);
+    public ResponseEntity<?> createOrUpdateBook(@RequestBody Book book) {
+        if (book.getTitle() == null || book.getTitle().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Book title is required.");
+        }
+        if (book.getStock() < 0) {
+            return ResponseEntity.badRequest().body("Stock cannot be negative.");
+        }
+        Book savedBook = bookService.saveBook(book);
+        return ResponseEntity.ok(savedBook);
     }
 
-    // Get All Books (For API)
+    // Get All Books
     @GetMapping
-    public List<Book> getAllBooks() {
-        return bookService.getAllBooks();
+    public ResponseEntity<List<Book>> getAllBooks() {
+        List<Book> books = bookService.getAllBooks();
+        return ResponseEntity.ok(books);
     }
 
     // Get Book by ID
     @GetMapping("/{id}")
-    public Optional<Book> getBookById(@PathVariable Long id) {
-        return bookService.getBookById(id);
+    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+        return bookService.getBookById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Get Books by Category
     @GetMapping("/category/{category}")
-    public List<Book> getBooksByCategory(@PathVariable String category) {
-        return bookService.getBooksByCategory(category);
+    public ResponseEntity<List<Book>> getBooksByCategory(@PathVariable String category) {
+        List<Book> books = bookService.getBooksByCategory(category);
+        return ResponseEntity.ok(books);
     }
 
     // Delete Book
     @DeleteMapping("/{id}")
-    public String deleteBook(@PathVariable Long id) {
+    public ResponseEntity<String> deleteBook(@PathVariable Long id) {
+        if (!bookService.getBookById(id).isPresent()) {
+            return ResponseEntity.status(404).body("Book not found.");
+        }
         bookService.deleteBook(id);
-        return "Book deleted successfully!";
-    }
-}
-
-// New Controller for Thymeleaf Views
-@Controller
-@RequestMapping("/books")
-class BookViewController {
-    
-    @Autowired
-    private BookService bookService;
-
-    @GetMapping
-    public String getBooksPage(Model model) {
-        List<Book> books = bookService.getAllBooks();
-        model.addAttribute("books", books);
-        return "books"; // Renders books.html inside templates/
+        return ResponseEntity.ok("Book deleted successfully!");
     }
 }

@@ -16,49 +16,39 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; // Encrypts passwords
+    private PasswordEncoder passwordEncoder;
 
-    // Create or Update User (Ensures Password is Hashed)
-    public User saveUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // Hash password before saving
+    public User registerUser(User user) {
+        // Encrypt the password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
-    // Authenticate User (Login)
-    public Optional<User> authenticate(String email, String password) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
-            return user; // Successful login
+    public User updateUser(Long id, User userDetails) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        user.setName(userDetails.getName());
+        user.setEmail(userDetails.getEmail());
+        user.setRole(userDetails.getRole());
+        // Optionally update password if provided (non-empty)
+        if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         }
-        return Optional.empty(); // Authentication failed
+        return userRepository.save(user);
     }
 
-    // Get All Users (Fixed type issue)
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    // Get User by ID
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
-    // Update User Profile (Only Update Non-null Fields)
-    public User updateUser(Long id, User updatedUser) {
-        return userRepository.findById(id).map(user -> {
-            if (updatedUser.getName() != null) user.setName(updatedUser.getName());
-            if (updatedUser.getEmail() != null) user.setEmail(updatedUser.getEmail());
-
-            // Update password only if a new one is provided
-            if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
-                user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-            }
-
-            return userRepository.save(user);
-        }).orElse(null);
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
-    // Delete User
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
